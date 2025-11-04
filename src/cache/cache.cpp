@@ -25,6 +25,8 @@ void cache::Run() {
 
 			entity.humanoid = modelInstance.FindFirstChild("Humanoid").address;
 			entity.rigType = entity.humanoid.GetRigType();
+			entity.humanoid.Health = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::Health);
+			entity.humanoid.MaxHealth = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::MaxHealth);
 
 			tempCache.push_back(entity);
 			if (entity.name == "nonflirtatiousness") {

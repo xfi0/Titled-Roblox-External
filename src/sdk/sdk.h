@@ -50,6 +50,8 @@ namespace Roblox {
 		std::uint8_t GetRigType();
 		void SetJumpPower(float power);
 		void SetWalkSpeed(float power);
+		float Health;
+		float MaxHealth;
 	};
 
 	struct model_instance_t final : public instance_t {
