@@ -29,9 +29,8 @@ void cache::Run() {
 			entity.humanoid.MaxHealth = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::MaxHealth);
 
 			tempCache.push_back(entity);
-			if (entity.name == "nonflirtatiousness") {
-				cachedLocalPlayer = entity;
-			}// TEST
+
+			cachedLocalPlayer = memory->read<entity_t>(game::players.address + Offsets::Player::LocalPlayer); // might work
 			cachedPlayers = tempCache;
 		}
 
