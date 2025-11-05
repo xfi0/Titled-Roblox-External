@@ -30,7 +30,7 @@ void cache::Run() {
 
 			tempCache.push_back(entity);
 
-			cachedLocalPlayer = memory->read<entity_t>(game::players.address + Offsets::Player::LocalPlayer); // might work
+			//cachedLocalPlayer = memory->read<entity_t>(game::players.address + Offsets::Player::LocalPlayer); // might work
 			cachedPlayers = tempCache;
 		}
 
