@@ -30,7 +30,6 @@ void cache::Run() {
 				entity.humanoid.MaxHealth = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::MaxHealth);
 
 				tempCache.push_back(entity);
-				printf("\n%s ", game::players.GetClassNameA().c_str());
 				Roblox::instance_t inst = game::players.FindFirstChildByClass("Player");
 				cachedLocalPlayer = {}; // clear
 				if (inst.address) {
