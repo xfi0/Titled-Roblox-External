@@ -5,6 +5,7 @@
 #include "../sdk/math/math.h"
 #include "../sdk/sdk.h"
 #include "../cache/cache.h"
+#include "modules/visuals/ESP.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -47,7 +48,7 @@ void Overlay::CreateOverlayWindow()
 
     window_handle = CreateWindowEx(
         WS_EX_TOPMOST | WS_EX_LAYERED,
-        "Minus", "external-maryjayne",
+        "Minus", "Titled External",
         WS_POPUP,
         0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
         NULL, NULL, GetModuleHandle(NULL), NULL
@@ -227,6 +228,8 @@ void Overlay::DrawWatermark()
         {
             cache::cachedLocalPlayer.humanoid.SetWalkSpeed(JumpPower);
         }
+        ImGui::Checkbox("Box ESP", &Visuals::BoxESP::boxESPEnabled);
+        ImGui::Checkbox("Name ESP", &Visuals::NameESP::nameESPEnabled);
 
         ImGui::SameLine();
         if (ImGui::Button("Close Menu"))
