@@ -37,9 +37,8 @@ public:
     
     void DrawText(math::vector2 position, const char* text, unsigned int color = 0xFFFFFFFF);
     void DrawWatermark();
-    
+    void DrawESPOverlay();
     float GetFPS() const { return current_fps; }
-
     bool ShouldExit();
     bool IsRunning();
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

@@ -12,7 +12,7 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static bool g_showMenu = true;
+static bool showMenu = true;
 
 Overlay::Overlay() {}
 
@@ -58,7 +58,7 @@ void Overlay::CreateOverlayWindow()
     ShowWindow(window_handle, SW_SHOW);
     UpdateWindow(window_handle);
 
-    if (!g_showMenu) {
+    if (!showMenu) {
         LONG_PTR ex = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
         ex |= WS_EX_TRANSPARENT;
         SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex);
@@ -163,7 +163,6 @@ void Overlay::EndFrame()
         context->ClearRenderTargetView(render_target_view, clear_color);
 
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
     if (swapchain)
     {
         swapchain->Present(0, DXGI_PRESENT_DO_NOT_WAIT);
@@ -179,10 +178,10 @@ void Overlay::DrawWatermark()
 {
     if (GetAsyncKeyState(VK_INSERT) & 1)
     {
-        g_showMenu = !g_showMenu;
+        showMenu = !showMenu;
 
         LONG_PTR ex = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
-        if (g_showMenu)
+        if (showMenu)
             ex &= ~WS_EX_TRANSPARENT;
         else
             ex |= WS_EX_TRANSPARENT;
@@ -207,7 +206,7 @@ void Overlay::DrawWatermark()
         dl->AddText(pos, white, buf);
     }
 
-    if (!g_showMenu)
+    if (!showMenu)
         return;
 
     ImGui::SetNextWindowSize(ImVec2(420, 220), ImGuiCond_FirstUseEver);
@@ -234,7 +233,7 @@ void Overlay::DrawWatermark()
         ImGui::SameLine();
         if (ImGui::Button("Close Menu"))
         {
-            g_showMenu = false;
+            showMenu = false;
             LONG_PTR ex = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
             ex |= WS_EX_TRANSPARENT;
             SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex);
@@ -244,6 +243,10 @@ void Overlay::DrawWatermark()
 
         ImGui::End();
     }
+}
+
+void Overlay::DrawESPOverlay() // need to get the draw list to draw on also
+{
 }
 
 bool Overlay::ShouldExit()
@@ -270,7 +273,7 @@ LRESULT CALLBACK Overlay::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
     switch (msg) {
     case WM_LBUTTONDOWN:
-        if (g_showMenu) {
+        if (showMenu) {
             ImGuiIO& io = ImGui::GetIO();
             if (!io.WantCaptureMouse) {
                 ReleaseCapture();

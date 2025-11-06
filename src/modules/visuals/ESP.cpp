@@ -20,21 +20,6 @@ math::Matrix4x4 Visuals::BoxESP::GetViewMatrix()
 	viewMatrix = memory->read<math::Matrix4x4>(visualEngine + Offsets::VisualEngine::ViewMatrix);
 	return viewMatrix;
 }
-
-void Visuals::BoxESP::RenderLoop()
-{
-	math::Matrix4x4 view = GetViewMatrix();
-	if (BoxESP::boxESPEnabled) {
-		for (auto& entity : cache::cachedPlayers) {
-			RenderBoxESP(entity, view);
-		}
-	}
-	if (NameESP::nameESPEnabled) {
-		for (auto& entity : cache::cachedPlayers) {
-			RenderNameESP(entity, view);
-		}
-	} 
-}
 static void RenderNameESP(cache::entity_t entity, math::Matrix4x4 view) {
 	if (entity.humanoid.address != cache::cachedLocalPlayer.humanoid.address) {
 		math::vector2 headposition2D;
@@ -52,4 +37,17 @@ static void RenderBoxESP(cache::entity_t entity, math::Matrix4x4 view) {
 		}
 	}
 }
-
+void Visuals::BoxESP::RenderLoop()
+{
+	math::Matrix4x4 view = GetViewMatrix();
+	if (BoxESP::boxESPEnabled) {
+		for (auto& entity : cache::cachedPlayers) {
+			RenderBoxESP(entity, view);
+		}
+	}
+	if (NameESP::nameESPEnabled) {
+		for (auto& entity : cache::cachedPlayers) {
+			RenderNameESP(entity, view);
+		}
+	}
+}
