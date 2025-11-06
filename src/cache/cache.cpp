@@ -29,7 +29,12 @@ void cache::Run() {
 				entity.humanoid.MaxHealth = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::MaxHealth);
 				auto rootPart = modelInstance.FindFirstChild("HumanoidRootPart");
 				auto headPart = modelInstance.FindFirstChild("Head");
-				auto leftFootPart = modelInstance.FindFirstChild("LeftFoot");
+				Roblox::instance_t leftFootPart;
+				if (entity.rigType == 1) // R15
+					 leftFootPart = modelInstance.FindFirstChild("LeftFoot");
+				else { // R6
+					 leftFootPart = modelInstance.FindFirstChild("LeftFoot");
+				}
 				auto primitive = memory->read<uintptr_t>(rootPart.address + Offsets::BasePart::Primitive);
 				auto headPrimitive = memory->read<uintptr_t>(headPart.address + Offsets::BasePart::Primitive);
 				auto leftFootPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftFootPart.address + Offsets::BasePart::Primitive) : 0;
@@ -62,6 +67,6 @@ void cache::Run() {
 		catch (...) {
 
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(25));
 	}
 }

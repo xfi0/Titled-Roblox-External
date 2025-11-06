@@ -26,24 +26,30 @@ void Visuals::BoxESP::RenderLoop()
 	math::Matrix4x4 view = GetViewMatrix();
 	if (BoxESP::boxESPEnabled) {
 		for (auto& entity : cache::cachedPlayers) {
-			if (entity.humanoid.address != cache::cachedLocalPlayer.humanoid.address) {
-				math::vector2 footPosition2D;
-				math::vector2 headposition2D;
-				if (math::math::WorldToScreen(entity.position, footPosition2D, view) && math::math::WorldToScreen(entity.headPosition, headposition2D, view) && entity.humanoid.address) {
-					ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(footPosition2D.x - ((headposition2D.y - footPosition2D.y) * 0.225f), headposition2D.y), ImVec2(footPosition2D.x + ((headposition2D.y - footPosition2D.y) * 0.225f), footPosition2D.y), IM_COL32(255, 0, 0, 200));
-				}
-			}
+			RenderBoxESP(entity, view);
 		}
 	}
 	if (NameESP::nameESPEnabled) {
 		for (auto& entity : cache::cachedPlayers) {
-			if (entity.humanoid.address != cache::cachedLocalPlayer.humanoid.address) {
-				math::vector2 headposition2D;
-				if (math::math::WorldToScreen(entity.headPosition, headposition2D, view) && entity.humanoid.address) {
-					ImGui::GetBackgroundDrawList()->AddText(ImVec2(headposition2D.x, headposition2D.y - 15.0f), IM_COL32(255, 255, 255, 220), entity.name.c_str());
-				}
-			}
+			RenderNameESP(entity, view);
 		}
 	} 
+}
+static void RenderNameESP(cache::entity_t entity, math::Matrix4x4 view) {
+	if (entity.humanoid.address != cache::cachedLocalPlayer.humanoid.address) {
+		math::vector2 headposition2D;
+		if (math::math::WorldToScreen(entity.headPosition, headposition2D, view) && entity.humanoid.address) {
+			ImGui::GetBackgroundDrawList()->AddText(ImVec2(headposition2D.x, headposition2D.y), IM_COL32(255, 255, 255, 220), entity.name.c_str());
+		}
+	}
+}
+static void RenderBoxESP(cache::entity_t entity, math::Matrix4x4 view) {
+	if (entity.humanoid.address != cache::cachedLocalPlayer.humanoid.address) {
+		math::vector2 footPosition2D;
+		math::vector2 headposition2D;
+		if (math::math::WorldToScreen(entity.position, footPosition2D, view) && math::math::WorldToScreen(entity.headPosition, headposition2D, view) && entity.humanoid.address) {
+			ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(footPosition2D.x - ((headposition2D.y - footPosition2D.y) * 0.225f), headposition2D.y), ImVec2(footPosition2D.x + ((headposition2D.y - footPosition2D.y) * 0.225f), footPosition2D.y), IM_COL32(255, 0, 0, 200));
+		}
+	}
 }
 

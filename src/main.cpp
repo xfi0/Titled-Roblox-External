@@ -58,7 +58,7 @@ std::int32_t main() {
 			for (cache::entity_t& entity : cache::cachedPlayers) {
 				printf("\n%s Is in the cache\n", entity.name.c_str());
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	}
 	catch (...) {
