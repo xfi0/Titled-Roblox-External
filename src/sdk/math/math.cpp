@@ -17,8 +17,8 @@ bool math::math::WorldToScreen(const vector3& world_pos, vector2& screen_pos, co
     screen_pos.x = (m[0] * world_pos.x + m[1] * world_pos.y + m[2] * world_pos.z + m[3]) * inv_w;
     screen_pos.y = (m[4] * world_pos.x + m[5] * world_pos.y + m[6] * world_pos.z + m[7]) * inv_w;
 
-    static constexpr float screen_width_half = 960.0f;
-    static constexpr float screen_height_half = 540.0f;
+    const float screen_width_half = static_cast<float>(GetSystemMetrics(SM_CXSCREEN)) * 0.5f;
+    const float screen_height_half = static_cast<float>(GetSystemMetrics(SM_CYSCREEN)) * 0.5f;
 
     screen_pos.x = screen_width_half * (screen_pos.x + 1.0f);
     screen_pos.y = screen_height_half * (1.0f - screen_pos.y);

@@ -23,7 +23,7 @@ math::Matrix4x4 Visuals::BoxESP::GetViewMatrix()
 
 void Visuals::BoxESP::RenderLoop()
 {
-	static math::Matrix4x4 view = GetViewMatrix();
+	math::Matrix4x4 view = GetViewMatrix();
 	if (BoxESP::boxESPEnabled) {
 		for (auto& entity : cache::cachedPlayers) {
 			if (entity.humanoid.address != cache::cachedLocalPlayer.humanoid.address) {
