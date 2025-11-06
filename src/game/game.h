@@ -4,4 +4,5 @@ namespace game {
 	inline Roblox::instance_t dataModel{};
 	inline Roblox::instance_t visualEngine{};
 	inline Roblox::instance_t players{};
+	inline Roblox::instance_t  camera{};
 }
