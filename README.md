@@ -13,7 +13,7 @@
 
 Titled is a repository for development and research purposes. The maintainer provides source files for study, modification, and redistribution under the terms of the GPL-3.0 license (see `LICENSE`).
 
-**Important:** The author and maintainer **does not condone** illicit cheating, abuse, or actions that violate terms of service of any platform. The author is **not responsible** for any consequences arising from misuse of this repository, including account suspension, bans, or legal consequences.
+**Important:** The author and maintainer **does not condone** illicit cheating, abuse, or actions that violates [Roblox TOS](https://en.help.roblox.com/hc/en-us/articles/115004647846-Roblox-Terms-of-Use). The author is **not responsible** for any consequences arising from misuse of this repository, including account suspension, bans, or legal consequences.
 
 ---
 
