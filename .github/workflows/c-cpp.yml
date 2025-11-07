@@ -1,4 +1,4 @@
-name: C/C++ CI widnos
+name: C/C++ CI windows
 
 on:
   push:
@@ -8,37 +8,48 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup MSVC environment
+      - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      - name: Configure (CMake)
-        if: exists('CMakeLists.txt')
-        run: |
-          mkdir build
-          cd build
-          cmake -G "Visual Studio 17 2022" -A x64 ..
+      - name: Find solution
+        id: find
         shell: bash
-
-      - name: Build (MSBuild)
-        if: exists('CMakeLists.txt')
         run: |
-          cd build
-          msbuild /m /p:Configuration=Release ALL_BUILD.vcxproj
+          SOL=$(ls *.slnx 2>/dev/null || ls *.sln 2>/dev/null || true)
+          if [ -z "$SOL" ]; then
+            echo "solution="
+            exit 0
+          fi
+          SOL=$(echo "$SOL" | head -n1)
+          echo "solution=$SOL" >> $GITHUB_OUTPUT
+
+      - name: Build solution
+        if: steps.find.outputs.solution != ''
         shell: bash
-
-      - name: Fallback build (MSYS/Mingw or custom)
-        if: !exists('CMakeLists.txt')
         run: |
-          echo "No CMakeLists.txt detected — run your Windows build commands here (e.g., call build.bat or use nmake)"
+          echo "Building $SOLUTION"
+          SOLUTION=${{ steps.find.outputs.solution }}
+          msbuild "$SOLUTION" /m /p:Configuration=Release
+
+      - name: Fail if no solution found
+        if: steps.find.outputs.solution == ''
+        run: |
+          echo "No .slnx or .sln found in repo." >&2
+          exit 1
         shell: bash
 
       - name: Run tests
-        if: exists('CMakeLists.txt')
-        run: |
-          cd build
-          ctest --output-on-failure -C Release
         shell: bash
+        run: |
+          # Run test executables if present (adjust glob if needed)
+          set -e
+          if ls *Tests.exe 1> /dev/null 2>&1; then
+            for t in *Tests.exe; do echo "Running $t"; ./"$t"; done
+          elif ls build/*Tests.exe 1> /dev/null 2>&1; then
+            for t in build/*Tests.exe; do echo "Running $t"; ./"$t"; done
+          else
+            echo "No test executables found; skipping tests."
+          fi
