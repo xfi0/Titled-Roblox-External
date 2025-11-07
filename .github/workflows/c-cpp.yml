@@ -1,0 +1,99 @@
+name: C/C++ CI (Windows MSVC)
+
+on:
+  push:
+    branches: [ "master" ]
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSVC environment
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Install vcpkg (optional, uncomment if you use vcpkg)
+        # - run: |
+        #     git clone https://github.com/microsoft/vcpkg.git ${GITHUB_WORKSPACE}\vcpkg
+        #     .\vcpkg\bootstrap-vcpkg.bat
+
+      - name: Configure (CMake)
+        if: exists('CMakeLists.txt')
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -A x64 ..
+
+      - name: Build (MSBuild)
+        if: exists('build') && steps.Configure.outcome != 'skipped'
+        run: |
+          cd build
+          msbuild /m /p:Configuration=Release ALL_BUILD.vcxproj
+
+      - name: Build (legacy make/autotools fallback)
+        if: !exists('CMakeLists.txt')
+        run: |
+          echo "No CMakeLists.txt detected; attempt MSYS/mingw build if project supports it"
+        shell: bash
+
+      - name: Run tests
+        if: exists('build') && steps.Configure.outcome != 'skipped'
+        run: |
+          cd build
+          ctest --output-on-failure -C Release
+        shell: bash
+
+      - name: Package artifacts (zip)
+        run: |
+          mkdir -p artifact
+          if [ -d build/Release ]; then
+            powershell -Command "Compress-Archive -Path build/Release/* -DestinationPath artifact/build-${{ github.run_id }}.zip"
+          else
+            powershell -Command "Get-ChildItem -Path . -Include *.exe,*.dll,*.pdb -Recurse | Compress-Archive -DestinationPath artifact/build-${{ github.run_id }}.zip"
+          fi
+        shell: bash
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-archive
+          path: artifact/*.zip
+
+  release:
+    name: Create Release and Upload Artifact
+    runs-on: windows-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-archive
+          path: ./artifact
+
+      - name: Create GitHub release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: "Automated release for ${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload asset to release
+        uses: softprops/gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: build-${{ github.run_id }}.zip
+          asset_path: ./artifact/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
