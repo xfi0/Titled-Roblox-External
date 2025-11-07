@@ -6,7 +6,7 @@
 #include "../sdk/sdk.h"
 #include "../cache/cache.h"
 #include "modules/visuals/ESP.h"
-
+#include "game/game.h"
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 
@@ -228,8 +228,16 @@ void Overlay::DrawWatermark()
             cache::cachedLocalPlayer.humanoid.SetWalkSpeed(JumpPower);
         }
         ImGui::Checkbox("Box ESP", &Visuals::BoxESP::boxESPEnabled);
+        ImGui::Checkbox("Filled Box ESP", &Visuals::BoxESP::filled);
+        ImGui::ColorEdit4("Box Color", (float*)&Visuals::BoxESP::boxColor, ImGuiColorEditFlags_NoInputs);
+        ImGui::SliderFloat("Box Rounding", &Visuals::BoxESP::rounding, 0.0f, 1.0f, "%.2f");
         ImGui::Checkbox("Name ESP", &Visuals::NameESP::nameESPEnabled);
-
+        ImGui::Text("World");
+        static double brightNess = 1.981; // default sometimes i dont wanna just read cause like null pointers and stuff ig 
+        ImGui::SliderFloat("Brightness (buggy)", reinterpret_cast<float*>(&brightNess), 0, 100);
+        if (brightNess != memory->read<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness)) {
+            memory->write<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness, brightNess);
+        }
         ImGui::SameLine();
         if (ImGui::Button("Close Menu"))
         {

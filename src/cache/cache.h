@@ -13,6 +13,8 @@ namespace cache {
 		math::vector3 position;
 		math::vector3 headPosition;
 		math::vector3 footPosition;
+		math::vector3 leftArmPosition;
+		math::vector3 rightArmPosition;
 
 		std::unordered_map<std::string, Roblox::part_t> parts;
 	};

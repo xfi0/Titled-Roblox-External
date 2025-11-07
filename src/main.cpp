@@ -37,7 +37,8 @@ std::int32_t main() {
 		//printf("VisualEngine: 0x%llx\n", game::visualEngine);
 
 		game::players = { game::dataModel.FindFirstChildByClass("Players") };
-		game::camera = { game::dataModel.FindFirstChildByClass("Workspace").FindFirstChild("Camera") };
+		game::workSpace = { game::dataModel.FindFirstChildByClass("Workspace") };
+		game::camera = { game::workSpace.FindFirstChild("Camera") };
 
 		std::thread(cache::Run).detach();
 		if (!OverlayInstance->Initialize())
