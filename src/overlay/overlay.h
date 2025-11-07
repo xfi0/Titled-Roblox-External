@@ -24,17 +24,17 @@ private:
     float current_fps = 0.0f;
     int frame_count = 0;
     std::chrono::high_resolution_clock::time_point fps_timer;
-    
+
 public:
     Overlay();
     ~Overlay();
-    
+
     bool Initialize();
     void Cleanup();
-    
+
     void BeginFrame();
     void EndFrame();
-    
+
     void DrawText(math::vector2 position, const char* text, unsigned int color = 0xFFFFFFFF);
     void DrawWatermark();
     void DrawESPOverlay();

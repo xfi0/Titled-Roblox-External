@@ -42,7 +42,6 @@ void cache::Run() {
 				auto leftFootPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftFootPart.address + Offsets::BasePart::Primitive) : 0;
 				auto leftArmPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftArmPart.address + Offsets::BasePart::Primitive) : 0;
 				auto rightArmPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftArmPart.address + Offsets::BasePart::Primitive) : 0;
-
 				entity.position = memory->read<math::vector3>(primitive + Offsets::BasePart::Position);
 				entity.headPosition = memory->read<math::vector3>(headPrimitive + Offsets::BasePart::Position);
 				entity.footPosition = memory->read<math::vector3>(leftFootPrimitive + Offsets::BasePart::Position);
@@ -73,6 +72,11 @@ void cache::Run() {
 		catch (...) {
 
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(25));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
+}
+
+bool cache::entity_t::isLocal(const entity_t& entity)
+{
+	return entity.humanoid.address == cachedLocalPlayer.humanoid.address;
 }

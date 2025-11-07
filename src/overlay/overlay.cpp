@@ -6,7 +6,9 @@
 #include "../sdk/sdk.h"
 #include "../cache/cache.h"
 #include "modules/visuals/ESP.h"
+#include "modules/aim/aimbot.h"
 #include "game/game.h"
+
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 
@@ -227,6 +229,7 @@ void Overlay::DrawWatermark()
         {
             cache::cachedLocalPlayer.humanoid.SetWalkSpeed(JumpPower);
         }
+        ImGui::Text("Visuals");
         ImGui::Checkbox("Box ESP", &Visuals::BoxESP::boxESPEnabled);
         ImGui::Checkbox("Filled Box ESP", &Visuals::BoxESP::filled);
         ImGui::ColorEdit4("Box Color", (float*)&Visuals::BoxESP::boxColor, ImGuiColorEditFlags_NoInputs);
@@ -238,6 +241,10 @@ void Overlay::DrawWatermark()
         if (brightNess != memory->read<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness)) {
             memory->write<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness, brightNess);
         }
+        ImGui::Text("Aim");
+        ImGui::Checkbox("AimBot", &aimbot::aimbotEnabled);
+		ImGui::Checkbox("Draw FOV", &aimbot::drawFOV);
+		ImGui::Checkbox("Use FOV", &aimbot::useFOV);
         ImGui::SameLine();
         if (ImGui::Button("Close Menu"))
         {

@@ -8,6 +8,7 @@
 #include "overlay/overlay.h"
 #include "imgui/imgui.h"
 #include "modules/visuals/ESP.h"
+#include "modules/aim/aimbot.h"
 
 std::unique_ptr<Overlay> OverlayInstance = std::make_unique<Overlay>();
 std::int32_t main() {
@@ -39,7 +40,7 @@ std::int32_t main() {
 		game::players = { game::dataModel.FindFirstChildByClass("Players") };
 		game::workSpace = { game::dataModel.FindFirstChildByClass("Workspace") };
 		game::camera = { game::workSpace.FindFirstChild("Camera") };
-
+		
 		std::thread(cache::Run).detach();
 		if (!OverlayInstance->Initialize())
 		{
@@ -52,13 +53,12 @@ std::int32_t main() {
 		{
 			OverlayInstance->BeginFrame();
 			Visuals::BoxESP::RenderLoop();
+			if (aimbot::aimbotEnabled) {
+				aimbot::Run();
+			}
 			OverlayInstance->EndFrame();
 		}
-
 		while (true) {
-			for (cache::entity_t& entity : cache::cachedPlayers) {
-				printf("\n%s Is in the cache\n", entity.name.c_str());
-			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	}

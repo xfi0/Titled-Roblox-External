@@ -12,6 +12,11 @@ namespace Visuals {
         inline static bool filled = false;
         inline static math::vector4 boxColor = math::vector4(255, 0, 0, 255);
     };
+    class BoneESP {
+    public:
+		inline static bool boneESPEnabled = false;
+		inline static math::vector4 boneColor = math::vector4(0, 255, 0, 255);
+    };
 
     class NameESP {
     public:

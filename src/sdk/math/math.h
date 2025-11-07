@@ -1,9 +1,16 @@
 #pragma once
+#include <cmath> 
 
 namespace math {
 
 	struct vector2 final {
 		float x{ 0.f }, y{ 0.f };
+
+		static float Distance(const vector2& a, const vector2& b) {
+			float dx = a.x - b.x;
+			float dy = a.y - b.y;
+			return std::sqrt(dx * dx + dy * dy);
+		}
 	};
 	struct vector3 final {
 		float x{ 0.f }, y{ 0.f }, z{ 0.f };

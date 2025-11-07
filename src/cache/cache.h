@@ -15,10 +15,9 @@ namespace cache {
 		math::vector3 footPosition;
 		math::vector3 leftArmPosition;
 		math::vector3 rightArmPosition;
-
+		bool isLocal(const entity_t& entity); // wanted to just do a {return humanoid address...} but stupid cpp
 		std::unordered_map<std::string, Roblox::part_t> parts;
 	};
-
 	inline cache::entity_t cachedLocalPlayer;
 	inline std::vector<cache::entity_t> cachedPlayers;
 
