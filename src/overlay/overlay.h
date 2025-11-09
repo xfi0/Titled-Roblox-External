@@ -28,7 +28,7 @@ private:
 public:
     Overlay();
     ~Overlay();
-
+    void RenderTab(const std::vector<std::string>& labels, int index);
     bool Initialize();
     void Cleanup();
 

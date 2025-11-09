@@ -7,7 +7,10 @@
 #include "../cache/cache.h"
 #include "modules/visuals/ESP.h"
 #include "modules/aim/aimbot.h"
+#include "modules/player/movement.h"
+
 #include "game/game.h"
+#include <algorithm> 
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -175,6 +178,7 @@ void Overlay::DrawText(math::vector2 position, const char* text, unsigned int co
 {
     ImGui::GetForegroundDrawList()->AddText(ImVec2(position.x, position.y), color, text);
 }
+static int tab = 0;
 
 void Overlay::DrawWatermark()
 {
@@ -192,6 +196,7 @@ void Overlay::DrawWatermark()
         SetLayeredWindowAttributes(window_handle, RGB(0, 0, 0), 0, LWA_COLORKEY);
         SetWindowPos(window_handle, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     }
+
     {
         ImDrawList* dl = ImGui::GetBackgroundDrawList();
         ImVec2 displaySize = ImGui::GetIO().DisplaySize;
@@ -211,42 +216,64 @@ void Overlay::DrawWatermark()
     if (!showMenu)
         return;
 
-    ImGui::SetNextWindowSize(ImVec2(420, 220), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowBgAlpha(0.85f);
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
     if (ImGui::Begin("Titled", nullptr, flags))
     {
-        ImGui::Text("Player");
-        ImGui::Separator();
+        std::vector<std::string> labels = { "Player", "Visuals", "Aim", "Teleport" };
+        RenderTab(labels, tab);
 
-        static float JumpPower = 50.0f;
-        if (ImGui::SliderFloat("Jump Power", &JumpPower, 0.0f, 100.0f))
-        {
-            cache::cachedLocalPlayer.humanoid.SetJumpPower(JumpPower);
+        tab = std::clamp(tab, 0, (int)labels.size() - 1);
+
+        if (tab == 0) {
+            static bool enabled = false;
+            if (ImGui::Checkbox("Noclip", &enabled)) {
+                movement::NoClip();
+            }
+            static float JumpPower = 50.0f;
+            if (ImGui::SliderFloat("Jump Power", &JumpPower, 0.0f, 100.0f))
+            {
+                cache::cachedLocalPlayer.humanoid.SetJumpPower(JumpPower);
+            }
+            static float WalkSpeed = 50.0f;
+            if (ImGui::SliderFloat("Walk Speed", &WalkSpeed, 0.0f, 100.0f))
+            {
+                cache::cachedLocalPlayer.humanoid.SetWalkSpeed(WalkSpeed);
+            }
         }
-        static float WalkSpeed = 50.0f;
-        if (ImGui::SliderFloat("Walk Speed", &WalkSpeed, 0.0f, 100.0f))
-        {
-            cache::cachedLocalPlayer.humanoid.SetWalkSpeed(JumpPower);
+        else if (tab == 1) {
+            ImGui::Columns(2, "VisualsColumns", true);
+            ImGui::BeginChild("General ESP");
+            ImGui::Checkbox("Box ESP", &Visuals::BoxESP::boxESPEnabled);
+            ImGui::Checkbox("Filled Box ESP", &Visuals::BoxESP::filled);
+            ImGui::ColorEdit4("Box Color", (float*)&Visuals::BoxESP::boxColor, ImGuiColorEditFlags_NoInputs);
+            ImGui::SliderFloat("Box Rounding", &Visuals::BoxESP::rounding, 0.0f, 1.0f, "%.2f");
+            ImGui::Checkbox("Name ESP", &Visuals::NameESP::nameESPEnabled);
+            ImGui::NextColumn();
+            ImGui::EndChild();
+
+            ImGui::BeginChild("World");
+            static double brightNess = 1.981; // default sometimes i dont wanna just read cause like null pointers and stuff ig 
+            ImGui::SliderFloat("Brightness (buggy)", reinterpret_cast<float*>(&brightNess), 0, 100);
+            if (brightNess != memory->read<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness)) {
+                memory->write<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness, brightNess);
+            }
+            ImGui::EndChild();
+            ImGui::Columns(1);
         }
-        ImGui::Text("Visuals");
-        ImGui::Checkbox("Box ESP", &Visuals::BoxESP::boxESPEnabled);
-        ImGui::Checkbox("Filled Box ESP", &Visuals::BoxESP::filled);
-        ImGui::ColorEdit4("Box Color", (float*)&Visuals::BoxESP::boxColor, ImGuiColorEditFlags_NoInputs);
-        ImGui::SliderFloat("Box Rounding", &Visuals::BoxESP::rounding, 0.0f, 1.0f, "%.2f");
-        ImGui::Checkbox("Name ESP", &Visuals::NameESP::nameESPEnabled);
-        ImGui::Text("World");
-        static double brightNess = 1.981; // default sometimes i dont wanna just read cause like null pointers and stuff ig 
-        ImGui::SliderFloat("Brightness (buggy)", reinterpret_cast<float*>(&brightNess), 0, 100);
-        if (brightNess != memory->read<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness)) {
-            memory->write<double>(game::dataModel.FindFirstChild("Lighting").address + Offsets::Lighting::Brightness, brightNess);
+        else if (tab == 2) {
+            ImGui::Checkbox("AimBot", &aimbot::aimbotEnabled);
+            ImGui::Checkbox("Draw FOV", &aimbot::drawFOV);
+            ImGui::Checkbox("Use FOV", &aimbot::useFOV);
         }
-        ImGui::Text("Aim");
-        ImGui::Checkbox("AimBot", &aimbot::aimbotEnabled);
-		ImGui::Checkbox("Draw FOV", &aimbot::drawFOV);
-		ImGui::Checkbox("Use FOV", &aimbot::useFOV);
-        ImGui::SameLine();
-        if (ImGui::Button("Close Menu"))
+        else if (tab == 3) {
+            if (ImGui::Button("Save Position")){
+                movement::SavePosition();
+            }
+        }
+
+      /*  if (ImGui::Button("Close Menu"))
         {
             showMenu = false;
             LONG_PTR ex = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
@@ -254,14 +281,58 @@ void Overlay::DrawWatermark()
             SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex);
             SetLayeredWindowAttributes(window_handle, RGB(0, 0, 0), 0, LWA_COLORKEY);
             SetWindowPos(window_handle, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-        }
+        }*/
 
         ImGui::End();
     }
 }
 
-void Overlay::DrawESPOverlay() // need to get the draw list to draw on also
+void Overlay::RenderTab(const std::vector<std::string>& labels, int index)
 {
+    static float animationCenter = 0.0f;
+    static float animationWidth = 0.0f;
+    static bool init = false;
+    const float speed = 18.0f;
+    float dt = ImGui::GetIO().DeltaTime > 0.f ? ImGui::GetIO().DeltaTime : (1.f / 60.f);
+
+    int n = (int)labels.size();
+    if (n <= 0) 
+        return;
+
+    tab = std::clamp(tab, 0, n - 1);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 4));
+    ImGui::BeginGroup();
+
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    std::vector<std::pair<ImVec2, ImVec2>> rects; rects.reserve(n);
+
+    for (int i = 0; i < n; ++i) {
+        if (i) ImGui::SameLine();
+        if (ImGui::Button(labels[i].c_str())) 
+            tab = i;
+        rects.emplace_back(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+    }
+
+    ImVec2 rmin = rects[tab].first, rmax = rects[tab].second;
+    float targetCenter = (rmin.x + rmax.x) * 0.5f;
+    float targetWidth = rmax.x - rmin.x;
+
+    if (!init) { 
+        animationCenter = targetCenter; animationWidth = targetWidth; init = true;
+    }
+
+    float a = 1.f - expf(-speed * dt);
+    animationCenter += (targetCenter - animationCenter) * a;
+    animationWidth += (targetWidth - animationWidth) * a;
+
+    float left = animationCenter - animationWidth * 0.5f;
+    float right = animationCenter + animationWidth * 0.5f;
+    float y = rmax.y;
+    dl->AddRectFilled(ImVec2(left, y), ImVec2(right, y + 3.f), ImGui::GetColorU32(ImVec4(0.08f, 0.6f, 0.95f, 1.f)), 0.f);
+
+    ImGui::EndGroup();
+    ImGui::PopStyleVar();
 }
 
 bool Overlay::ShouldExit()

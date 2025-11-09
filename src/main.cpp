@@ -9,8 +9,24 @@
 #include "imgui/imgui.h"
 #include "modules/visuals/ESP.h"
 #include "modules/aim/aimbot.h"
+#include "modules/player/movement.h"
 
 std::unique_ptr<Overlay> OverlayInstance = std::make_unique<Overlay>();
+static void moduleLoop() {
+	if (aimbot::aimbotEnabled) {
+		aimbot::Run();
+	}
+	const math::vector3& pos = math::vector3(100.0f, 100.0f, 100.0f);
+	movement::Teleport(pos); // just to test movement module
+}
+static void ClearPlayers() {
+	cache::cachedLocalPlayer = cache::entity_t{};
+	cache::cachedPlayers = std::vector<cache::entity_t>{};
+	//cache::cachedPlayersMutex = std::mutex{};
+}
+static void HandleTeleport() {
+
+}
 std::int32_t main() {
 	try {
 		static const char* procName = "RobloxPlayerBeta.exe";
@@ -48,14 +64,12 @@ std::int32_t main() {
 			std::cin.get();
 			return 1;
 		}
-
 		while (OverlayInstance->IsRunning())
 		{
 			OverlayInstance->BeginFrame();
+			moduleLoop();
+			movement::NoClip();
 			Visuals::BoxESP::RenderLoop();
-			if (aimbot::aimbotEnabled) {
-				aimbot::Run();
-			}
 			OverlayInstance->EndFrame();
 		}
 		while (true) {

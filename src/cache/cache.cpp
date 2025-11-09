@@ -11,62 +11,102 @@ void cache::Run() {
 				cache::entity_t entity{};
 
 				entity.name = player.GetName();
-				//entity.rigTsype = 
 
 				Roblox::model_instance_t modelInstance = player.GetModelInstance();
+				if (!modelInstance.address)
+					continue;
 
 				auto parts = modelInstance.GetChildren<Roblox::part_t>();
 				for (auto& part : parts) {
 					std::string partClass = part.GetClassNameA();
-					if (partClass.find("part") != std::string::npos) {
+					if (partClass.find("part") != std::string::npos && part.address) {
 						entity.parts[part.GetName()] = part;
 					}
 				}
 
-				entity.humanoid = modelInstance.FindFirstChild("Humanoid").address;
+				auto humanoidInst = modelInstance.FindFirstChild("Humanoid");
+				if (!humanoidInst.address) continue;
+				entity.humanoid = humanoidInst.address;
+
 				entity.rigType = entity.humanoid.GetRigType();
+
 				entity.humanoid.Health = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::Health);
 				entity.humanoid.MaxHealth = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::MaxHealth);
+				
+				if (entity.humanoid.Health <= 0.0f || entity.humanoid.MaxHealth <= 0.0f)
+					continue;
+
 				auto rootPart = modelInstance.FindFirstChild("HumanoidRootPart");
+				if (!rootPart.address)
+					continue;
+
 				auto headPart = modelInstance.FindFirstChild("Head");
+				if (headPart.address)
+					entity.head = headPart.address;
+
 				Roblox::instance_t leftFootPart;
-				if (entity.rigType == 1) // R15
-					 leftFootPart = modelInstance.FindFirstChild("LeftFoot");
-				else { // R6
-					 leftFootPart = modelInstance.FindFirstChild("LeftLeg");
+				if (entity.rigType == 1) { // r15
+					leftFootPart = modelInstance.FindFirstChild("LeftFoot");
+					if (leftFootPart.address)
+						entity.leftLeg = leftFootPart.address;
 				}
+				else { // r6
+					leftFootPart = modelInstance.FindFirstChild("LeftLeg");
+					if (leftFootPart.address)
+					entity.leftLeg = leftFootPart.address;
+				}
+
 				auto leftArmPart = modelInstance.FindFirstChild("LeftArm");
-				auto rightArmPart = modelInstance.FindFirstChild("LeftArm");
-				auto primitive = rootPart.address ? memory->read<uintptr_t>(rootPart.address + Offsets::BasePart::Primitive) : 0;
+				if (leftArmPart.address) 
+					entity.leftArm = leftArmPart.address;
+
+				auto rightArmPart = modelInstance.FindFirstChild("RightArm");
+				if (rightArmPart.address)
+					entity.rightArm = rightArmPart.address;
+
+				auto primitive = memory->read<uintptr_t>(rootPart.address + Offsets::BasePart::Primitive);
+				if (!primitive) continue;
+
 				auto headPrimitive = headPart.address ? memory->read<uintptr_t>(headPart.address + Offsets::BasePart::Primitive) : 0;
 				auto leftFootPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftFootPart.address + Offsets::BasePart::Primitive) : 0;
-				auto leftArmPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftArmPart.address + Offsets::BasePart::Primitive) : 0;
-				auto rightArmPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftArmPart.address + Offsets::BasePart::Primitive) : 0;
-				entity.position = memory->read<math::vector3>(primitive + Offsets::BasePart::Position);
-				entity.headPosition = memory->read<math::vector3>(headPrimitive + Offsets::BasePart::Position);
-				entity.footPosition = memory->read<math::vector3>(leftFootPrimitive + Offsets::BasePart::Position);
-				entity.rightArmPosition = memory->read<math::vector3>(rightArmPrimitive + Offsets::BasePart::Position); 
-				entity.leftArmPosition = memory->read<math::vector3>(leftArmPrimitive + Offsets::BasePart::Position); 
+				auto leftArmPrimitive = leftArmPart.address ? memory->read<uintptr_t>(leftArmPart.address + Offsets::BasePart::Primitive) : 0;
+				auto rightArmPrimitive = rightArmPart.address ? memory->read<uintptr_t>(rightArmPart.address + Offsets::BasePart::Primitive) : 0;
 
+				entity.position = memory->read<math::vector3>(primitive + Offsets::BasePart::Position);
+				if (headPrimitive) 
+					entity.headPosition = memory->read<math::vector3>(headPrimitive + Offsets::BasePart::Position);
+				if (leftFootPrimitive) 
+					entity.footPosition = memory->read<math::vector3>(leftFootPrimitive + Offsets::BasePart::Position);
+				if (rightArmPrimitive) 
+					entity.rightArmPosition = memory->read<math::vector3>(rightArmPrimitive + Offsets::BasePart::Position);
+				if (leftArmPrimitive) 
+					entity.leftArmPosition = memory->read<math::vector3>(leftArmPrimitive + Offsets::BasePart::Position);
+
+				entity.health = entity.humanoid.Health;
+				entity.maxHealth = entity.humanoid.MaxHealth;
 
 				tempCache.push_back(entity);
-				//printf("\n%s ", game::players.GetClassNameA().c_str());
+			}
+
+			{
+				std::lock_guard<std::mutex> lk(cachedPlayersMutex);
+
+				cachedLocalPlayer = {};
 				Roblox::instance_t inst = game::players.FindFirstChildByClass("Player");
-				cachedLocalPlayer = {}; // clear
 				if (inst.address) {
 					for (auto& ent : tempCache) {
 						if (ent.humanoid.address && ent.humanoid.address == inst.address) {
 							cachedLocalPlayer = ent;
 							break;
 						}
-						if (!ent.name.empty() && ent.name == inst.GetName()) { // fallback
+						if (!ent.name.empty() && ent.name == inst.GetName()) {
 							cachedLocalPlayer = ent;
 							break;
 						}
 					}
 				}
 
-				cachedPlayers = tempCache;
+				cachedPlayers = std::move(tempCache);
 			}
 		}
 		catch (...) {
@@ -75,6 +115,7 @@ void cache::Run() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 }
+
 
 bool cache::entity_t::isLocal(const entity_t& entity)
 {

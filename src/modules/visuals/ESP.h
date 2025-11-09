@@ -22,4 +22,8 @@ namespace Visuals {
     public:
         inline static bool nameESPEnabled = true;
     };
+    class HealthBar {
+    public:
+		inline static bool healthBarEnabled = true;
+    };
 }
