@@ -16,8 +16,8 @@ static void moduleLoop() {
 	if (aimbot::aimbotEnabled) {
 		aimbot::Run();
 	}
-	const math::vector3& pos = math::vector3(100.0f, 100.0f, 100.0f);
-	movement::Teleport(pos); // just to test movement module
+	//const math::vector3& pos = math::vector3(100.0f, 100.0f, 100.0f);
+	//movement::Teleport(pos); // just to test movement module
 }
 static void ClearPlayers() {
 	cache::cachedLocalPlayer = cache::entity_t{};
