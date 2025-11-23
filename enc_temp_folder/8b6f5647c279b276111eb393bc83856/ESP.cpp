@@ -109,6 +109,31 @@ static void RenderBoneESP(const cache::entity_t& entity, const cache::entity_t& 
 	if (!entity.humanoid.address || entity.humanoid.address == localPlayer.humanoid.address)
 		return;
 
+	auto drawLineIfValid = [&](const math::vector3& start, const math::vector3& end) {
+		math::vector2 start2D, end2D;
+		if (math::math::WorldToScreen(start, start2D, view) && math::math::WorldToScreen(end, end2D, view)) {
+			ImGui::GetForegroundDrawList()->AddLine(
+				ImVec2(start2D.x, start2D.y),
+				ImVec2(end2D.x, end2D.y),
+				ImGui::ColorConvertFloat4ToU32(ImVec4(
+					Visuals::BoneESP::boneColor.x,
+					Visuals::BoneESP::boneColor.y,
+					Visuals::BoneESP::boneColor.z,
+					Visuals::BoneESP::boneColor.w
+				))
+			);
+		}
+		};
+
+	// Draw left arm → torso (root) for R6/R15
+	drawLineIfValid(entity.leftArmPosition, entity.position);
+	drawLineIfValid(entity.rightArmPosition, entity.position);
+
+	// Optional: head → torso
+	drawLineIfValid(entity.headPosition, entity.position);
+
+	// Optional: left leg → torso
+	drawLineIfValid(entity.footPosition, entity.position);
 }
 
 void Visuals::BoxESP::RenderLoop()

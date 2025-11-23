@@ -1,5 +1,6 @@
 #include "math.h"
 #include <Windows.h>
+#include "modules/visuals/ESP.h"
 
 bool math::math::WorldToScreen(const vector3& world_pos, vector2& screen_pos, const Matrix4x4& view_matrix)
 {
@@ -24,4 +25,12 @@ bool math::math::WorldToScreen(const vector3& world_pos, vector2& screen_pos, co
     screen_pos.y = screen_height_half * (1.0f - screen_pos.y);
 
     return true;
+}
+
+math::vector2 math::vector3::WorldToScreen() // TODO: fix when not visible it draws
+{
+    vector2 tempPos;
+    if (math::WorldToScreen(*this, tempPos, Visuals::Visuals::GetViewMatrix())) {
+        return tempPos;
+    }
 }

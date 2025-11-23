@@ -4,6 +4,9 @@
 #include <iostream>
 #include "memory/memory.h"
 #include "offsets.h"
+#include "sdk/math/math.h"
+#include "modules/visuals/ESP.h"
+
 /*
 
 #pragma once
@@ -105,6 +108,7 @@ Roblox::model_instance_t Roblox::player_t::GetModelInstance()
 {
 	return memory->read<std::uint64_t>(this->address + Offsets::Player::ModelInstance);
 }
+
 
 Roblox::primitive_t Roblox::part_t::GetPrimitive()
 {

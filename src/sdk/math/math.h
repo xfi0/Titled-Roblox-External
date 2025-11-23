@@ -14,6 +14,7 @@ namespace math {
 	};
 	struct vector3 final {
 		float x{ 0.f }, y{ 0.f }, z{ 0.f };
+		vector2 WorldToScreen();
 	};
 	struct vector4 final {
 		float x{ 0.f }, y{ 0.f }, z{ 0.f }, w{ 0.f };

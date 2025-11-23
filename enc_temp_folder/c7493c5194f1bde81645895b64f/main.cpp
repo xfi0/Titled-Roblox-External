@@ -95,7 +95,7 @@ namespace teleportHandler
 static void moduleLoop()
 {
     if (aimbot::aimbotEnabled) aimbot::Run();
-    //movement::NoClip();
+    movement::NoClip();
 }
 
 std::int32_t main()
