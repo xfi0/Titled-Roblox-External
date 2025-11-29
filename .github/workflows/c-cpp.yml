@@ -16,11 +16,16 @@ jobs:
 
       - name: Find solution
         id: find
-        shell: powershell
+        shell: pwsh
         run: |
-          $sln = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Include *.slnx,*.sln -File -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($null -eq $sln) { Write-Output "solution="; exit 0 }
-          Write-Output ("solution=" + $sln.Name) | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+          $sln = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse `-Include *.sln, *.slnx -File -ErrorAction SilentlyContinue | Select-Object -First 1
+
+          if ($null -eq $sln) {
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "solution="
+          exit 0
+            }
+            Add-Content -Path $env:GITHUB_OUTPUT -Value "solution=$($sln.FullName)"
+
 
       - name: Build solution (MSBuild, x64, C++20)
         if: steps.find.outputs.solution != ''
