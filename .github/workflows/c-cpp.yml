@@ -18,7 +18,8 @@ jobs:
         id: find
         shell: pwsh
         run: |
-          $sln = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse `-Include *.sln, *.slnx -File -ErrorAction SilentlyContinue | Select-Object -First 1
+          $sln = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse `
+          -Include *.sln, *.slnx -File -ErrorAction SilentlyContinue | Select-Object -First 1
 
           if ($null -eq $sln) {
           Add-Content -Path $env:GITHUB_OUTPUT -Value "solution="
