@@ -32,6 +32,7 @@ jobs:
         if: steps.find.outputs.solution != ''
         shell: powershell
         run: |
+          msbuild Titled-Roblox-External.sln /p:PlatformToolset=v143 /p:Configuration=Release
           $slnx = "${{ steps.find.outputs.solution }}"
           Write-Host "Building $slnx for x64 (Release) with C++20"
           # Set MSBuild properties: Configuration=Release, Platform=x64, enable C++20 (/std:c++20), Optimize etc.
