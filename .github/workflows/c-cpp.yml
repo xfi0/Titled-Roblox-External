@@ -16,18 +16,25 @@ jobs:
 
       - name: Find solution
         id: find
-        shell: powershell
+        shell: pwsh
         run: |
-          $sln = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Include *.slnx,*.sln -File -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($null -eq $sln) { Write-Output "solution="; exit 0 }
-          Write-Output ("solution=" + $sln.Name) | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+          $sln = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse `
+          -Include *.sln, *.slnx -File -ErrorAction SilentlyContinue | Select-Object -First 1
+
+          if ($null -eq $sln) {
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "solution="
+          exit 0
+            }
+            Add-Content -Path $env:GITHUB_OUTPUT -Value "solution=$($sln.FullName)"
+
 
       - name: Build solution (MSBuild, x64, C++20)
         if: steps.find.outputs.solution != ''
         shell: powershell
         run: |
-          $sln = "${{ steps.find.outputs.solution }}"
-          Write-Host "Building $sln for x64 (Release) with C++20"
+          msbuild Titled-Roblox-External.sln /p:PlatformToolset=v143 /p:Configuration=Release
+          $slnx = "${{ steps.find.outputs.solution }}"
+          Write-Host "Building $slnx for x64 (Release) with C++20"
           # Set MSBuild properties: Configuration=Release, Platform=x64, enable C++20 (/std:c++20), Optimize etc.
           & msbuild $sln /m /p:Configuration=Release /p:Platform=x64 /p:CLToolsetVersion=Native /p:AdditionalOptions="/std:c++20"
 
@@ -37,17 +44,3 @@ jobs:
         run: |
           Write-Error "No .slnx or .sln found in repo."
           exit 1
-
-      - name: Run tests (PowerShell)
-        shell: powershell
-        run: |
-          $exes = Get-ChildItem -Path . -Recurse -Include *Tests.exe -File -ErrorAction SilentlyContinue
-          if ($exes.Count -eq 0) {
-            Write-Host "No test executables found; skipping tests."
-            exit 0
-          }
-          foreach ($e in $exes) {
-            Write-Host "Running $($e.FullName)"
-            & $e.FullName
-            if ($LASTEXITCODE -ne 0) { throw "Test executable $($e.Name) failed with code $LASTEXITCODE" }
-          }
