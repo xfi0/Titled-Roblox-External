@@ -187,31 +187,62 @@ void Overlay::DrawWatermark()
         showMenu = !showMenu;
 
         LONG_PTR ex = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
-        if (showMenu)
-            ex &= ~WS_EX_TRANSPARENT;
-        else
-            ex |= WS_EX_TRANSPARENT;
+        showMenu ? ex &= ~WS_EX_TRANSPARENT : ex |= WS_EX_TRANSPARENT;
         SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex);
 
         SetLayeredWindowAttributes(window_handle, RGB(0, 0, 0), 0, LWA_COLORKEY);
-        SetWindowPos(window_handle, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+        SetWindowPos(window_handle, nullptr, 0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     }
 
-    {
-        ImDrawList* dl = ImGui::GetBackgroundDrawList();
-        ImVec2 displaySize = ImGui::GetIO().DisplaySize;
-        char buf[64];
-        snprintf(buf, sizeof(buf), "Titled | %.0f FPS", GetFPS());
-        ImVec2 textSize = ImGui::CalcTextSize(buf);
-        ImVec2 pos = ImVec2(displaySize.x - textSize.x - 10.0f, 10.0f);
-        ImU32 outline = IM_COL32(0, 0, 0, 200);
-        ImU32 white = IM_COL32(255, 255, 255, 220);
-        dl->AddText(ImVec2(pos.x - 1, pos.y - 1), outline, buf);
-        dl->AddText(ImVec2(pos.x + 1, pos.y - 1), outline, buf);
-        dl->AddText(ImVec2(pos.x - 1, pos.y + 1), outline, buf);
-        dl->AddText(ImVec2(pos.x + 1, pos.y + 1), outline, buf);
-        dl->AddText(pos, white, buf);
-    }
+    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    ImVec2 screen = ImGui::GetIO().DisplaySize;
+
+    char text[64];
+    snprintf(text, sizeof(text), "Titled  |  %.0f FPS", GetFPS()); // NEVER FUCKING DRAG IT IT WILL BREAK BRO
+
+    ImVec2 textSize = ImGui::CalcTextSize(text);
+    ImVec2 padding(10.f, 6.f);
+
+    ImVec2 pos(
+        screen.x - textSize.x - padding.x * 2 - 15.f,
+        12.f
+    );
+
+    ImVec2 size(
+        textSize.x + padding.x * 2,
+        textSize.y + padding.y * 2
+    );
+
+    float rounding = 8.f;
+
+    dl->AddRectFilled(
+        ImVec2(pos.x + 2, pos.y + 2),
+        ImVec2(pos.x + size.x + 2, pos.y + size.y + 2),
+        IM_COL32(0, 0, 0, 120),
+        rounding
+    );
+
+    dl->AddRectFilled(
+        pos,
+        ImVec2(pos.x + size.x, pos.y + size.y),
+        IM_COL32(18, 18, 18, 220),
+        rounding
+    );
+
+    dl->AddRectFilled(
+        pos,
+        ImVec2(pos.x + 3.f, pos.y + size.y),
+        IM_COL32(160, 90, 255, 255),
+        rounding,
+        ImDrawFlags_RoundCornersLeft
+    );
+
+    dl->AddText(
+        ImVec2(pos.x + padding.x, pos.y + padding.y),
+        IM_COL32(230, 230, 230, 255),
+        text
+    );
 
     if (!showMenu)
         return;
@@ -267,6 +298,14 @@ void Overlay::DrawWatermark()
             ImGui::Checkbox("AimBot", &aimbot::aimbotEnabled);
             ImGui::Checkbox("Draw FOV", &aimbot::drawFOV);
             ImGui::Checkbox("Use FOV", &aimbot::useFOV);
+
+            ImGui::SliderFloat(
+                "FOV Radius",
+                &aimbot::fovRadius,
+                20.0f,
+                500.0f,
+                "%.0f"
+            );
         }
         else if (tab == 3) {
             if (ImGui::Button("Save Position")){
