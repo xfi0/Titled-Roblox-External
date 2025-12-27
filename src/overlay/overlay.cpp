@@ -258,9 +258,13 @@ void Overlay::DrawWatermark()
         tab = std::clamp(tab, 0, (int)labels.size() - 1);
 
         if (tab == 0) {
-            static bool enabled = false;
-            if (ImGui::Checkbox("Noclip", &enabled)) {
+            static bool NoclipEnabled = false;
+            if (ImGui::Checkbox("Noclip", &NoclipEnabled)) {
                 movement::NoClip();
+            }
+            static bool SpinEnabled = false;
+            if (ImGui::Checkbox("SpinBot", &SpinEnabled)) {
+                movement::SpinBot();
             }
             static float JumpPower = 50.0f;
             if (ImGui::SliderFloat("Jump Power", &JumpPower, 0.0f, 100.0f))

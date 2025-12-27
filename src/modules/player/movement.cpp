@@ -14,7 +14,13 @@ void movement::Teleport(math::vector3 Position)
 void movement::SavePosition() {
 
 }
+void movement::SpinBot() {
 
+}
+struct cframe final
+{
+
+};
 void movement::NoClip() // probably ahh but i tested 3 other things and it wouldnt work, neither does this
 {
 	try {
