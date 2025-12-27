@@ -17,16 +17,20 @@ void movement::SavePosition() {
 
 void movement::NoClip() // probably ahh but i tested 3 other things and it wouldnt work, neither does this
 {
-	/*try {
-		memory->write<bool>(cache::cachedLocalPlayer.humanoid.address + Offsets::PrimitiveFlags::CanCollide, false);
-		memory->write<bool>(cache::cachedLocalPlayer.leftArm.address + Offsets::PrimitiveFlags::CanCollide, false);
-		memory->write<bool>(cache::cachedLocalPlayer.leftLeg.address + Offsets::PrimitiveFlags::CanCollide, false);
-		memory->write<bool>(cache::cachedLocalPlayer.rightArm.address + Offsets::PrimitiveFlags::CanCollide, false);
-		memory->write<bool>(cache::cachedLocalPlayer.leftArm.address + Offsets::PrimitiveFlags::CanCollide, false);
-		memory->write<bool>(cache::cachedLocalPlayer.head.address + Offsets::PrimitiveFlags::CanCollide, false);
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	try {
+		std::vector<cache::entity_t> snapshot;
+		cache::entity_t localPlayerSnapshot;
+		{
+			std::lock_guard<std::mutex> lk(cache::cachedPlayersMutex);
+			snapshot = cache::cachedPlayers;
+			localPlayerSnapshot = cache::cachedLocalPlayer;
+		}
+		const cache::entity_t& localPlayer = localPlayerSnapshot;
+		for (auto child : localPlayer.parts) {
+			memory->write<std::uint8_t>(child.second.address + Offsets::PrimitiveFlags::CanCollide, 0);
+		}
 	}
 	catch (...){
 
-	}*/
+	}
 }

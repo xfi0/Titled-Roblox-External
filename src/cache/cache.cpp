@@ -31,6 +31,7 @@ void cache::Run() {
 
 							if (!part.address) continue;
 							//part. = inst.GetName();
+
 							entity.parts[inst.GetName()] = part;
 						}
 					}
