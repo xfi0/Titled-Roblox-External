@@ -71,6 +71,35 @@ void Overlay::CreateOverlayWindow()
     }
 }
 
+void Overlay::CreateESPWindow() {
+    WNDCLASSEX wc = {};
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = GetModuleHandle(NULL);
+    wc.lpszClassName = "Titled ESP";
+    RegisterClassEx(&wc);
+
+    window_handle = CreateWindowEx(
+        WS_EX_TOPMOST | WS_EX_LAYERED,
+        "Titled", "Titled ESP Overlay",
+        WS_POPUP,
+        0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
+        NULL, NULL, GetModuleHandle(NULL), NULL
+    );
+    
+    SetLayeredWindowAttributes(window_handle, RGB(0, 0, 0), 0, LWA_COLORKEY);
+    ShowWindow(window_handle, SW_SHOW);
+    UpdateWindow(window_handle);
+
+    if (!showMenu) {
+        LONG_PTR ex = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
+        ex |= WS_EX_TRANSPARENT;
+        SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex);
+        SetWindowPos(window_handle, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    }
+}
+
 void Overlay::InitializeDirectX()
 {
     DXGI_SWAP_CHAIN_DESC scd = {};
@@ -159,8 +188,7 @@ void Overlay::BeginFrame()
 
 void Overlay::EndFrame()
 {
-    DrawWatermark();
-
+    DrawWindow();
     ImGui::Render();
 
     static const float clear_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -180,7 +208,7 @@ void Overlay::DrawText(math::vector2 position, const char* text, unsigned int co
 }
 static int tab = 0;
 
-void Overlay::DrawWatermark()
+void Overlay::DrawWindow()
 {
     if (GetAsyncKeyState(VK_INSERT) & 1)
     {
@@ -199,7 +227,7 @@ void Overlay::DrawWatermark()
     ImVec2 screen = ImGui::GetIO().DisplaySize;
 
     char text[64];
-    snprintf(text, sizeof(text), "Titled  |  %.0f FPS", GetFPS()); // NEVER FUCKING DRAG IT IT WILL BREAK BRO
+    snprintf(text, sizeof(text), "Titled  |  %.0f FPS", GetFPS()); // NEVER FUCKING DRAG IT IT WILL BREAK BRO, Stop Lying - SIgned 2025 dom
 
     ImVec2 textSize = ImGui::CalcTextSize(text);
     ImVec2 padding(10.f, 6.f);
@@ -329,6 +357,11 @@ void Overlay::DrawWatermark()
 
         ImGui::End();
     }
+}
+
+void Overlay::DrawESPOverlay()
+{
+
 }
 
 void Overlay::RenderTab(const std::vector<std::string>& labels, int index)

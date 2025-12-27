@@ -21,7 +21,22 @@ namespace Roblox {
 		addressable_t() : address(0) {}
 		addressable_t(std::uint64_t address) : address(address) {}
 	};
+	struct CFrame
+	{
+		float m[3][3];
+		math::vector3 position;
 
+		CFrame() : m{ {1,0,0},{0,1,0},{0,0,1} }, position{ 0,0,0 } {}
+		CFrame(const math::vector3& pos) : m{ {1,0,0},{0,1,0},{0,0,1} }, position(pos) {}
+		CFrame(float m00, float m01, float m02,
+			float m10, float m11, float m12,
+			float m20, float m21, float m22,
+			float px, float py, float pz)
+			: m{ {m00, m01, m02}, {m10, m11, m12}, {m20, m21, m22} },
+			position{ px, py, pz } {
+		}
+
+	};
 	struct nameable_t : public addressable_t {
 		using addressable_t::addressable_t;
 		std::string name;

@@ -9,7 +9,7 @@ void cache::Run() {
 			std::vector<cache::entity_t> tempCache;
 			for (Roblox::player_t& player : players) {
 				cache::entity_t entity{};
-
+				
 				entity.name = player.GetName();
 
 				Roblox::model_instance_t modelInstance = player.GetModelInstance();
@@ -60,6 +60,7 @@ void cache::Run() {
 				if (!primitive) continue;
 
 				entity.position = memory->read<math::vector3>(primitive + Offsets::BasePart::Position);
+				entity.rotation = memory->read<math::vector3>(primitive + Offsets::BasePart::Rotation);
 		
 				entity.health = entity.humanoid.Health;
 				entity.maxHealth = entity.humanoid.MaxHealth;

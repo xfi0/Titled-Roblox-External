@@ -154,7 +154,7 @@ std::make_pair("Torso", "RightLeg"),
 static void RenderBoneESP(const cache::entity_t& entity, const cache::entity_t& localPlayer, const math::Matrix4x4& view) {
 	if (!entity.humanoid.address || entity.humanoid.address == localPlayer.humanoid.address || entity.health <= 0 || entity.parts.size() <= 0)
 		return;
-
+	
 	auto humanoid = entity.humanoid;
 	if (humanoid.GetRigType() == Roblox::R15) {
 		for (const auto& [parent, child] : R15boneConnections) {

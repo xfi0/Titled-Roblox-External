@@ -23,6 +23,10 @@ namespace math {
 	{
 		float m[4][4];
 	};
+	struct Matrix4x3
+	{
+		float m[4][3];
+	};
 	class math {
 	public:
 		static bool WorldToScreen(const vector3& world_pos, vector2& screen_pos, const Matrix4x4& view_matrix);

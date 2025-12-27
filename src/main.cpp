@@ -95,7 +95,6 @@ namespace teleportHandler
 static void moduleLoop()
 {
     if (aimbot::aimbotEnabled) aimbot::Run();
-    //movement::NoClip();
 }
 
 std::int32_t main()
@@ -137,7 +136,6 @@ std::int32_t main()
             std::cin.get();
             return 1;
         }
-
         while (OverlayInstance->IsRunning())
         {
             OverlayInstance->BeginFrame();
