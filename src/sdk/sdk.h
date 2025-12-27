@@ -4,9 +4,13 @@
 #include <string>
 #include "memory/memory.h"
 #include "offsets.h"
+#include "sdk/math/math.h"
 
 namespace Roblox {
-
+	enum RigType : std::uint8_t {
+		R15 = 1,
+		R6 = 0
+	};
 	class instance_t;
 	class primitive_t;
 	class model_instance_t;
@@ -20,7 +24,7 @@ namespace Roblox {
 
 	struct nameable_t : public addressable_t {
 		using addressable_t::addressable_t;
-
+		std::string name;
 		std::string GetName();
 		std::string GetClassNameA();
 	};
@@ -61,11 +65,12 @@ namespace Roblox {
 	struct part_t  : public instance_t{
 		using instance_t::instance_t;
 
-		Roblox::primitive_t GetPrimitive();
+		Roblox::primitive_t GetPrimitive() const;
 	};
 
 	struct primitive_t final : addressable_t  {
 		using addressable_t::addressable_t;
+		math::vector3 GetPosition();
 	};
 }
 

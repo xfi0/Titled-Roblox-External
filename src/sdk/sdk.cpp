@@ -46,9 +46,10 @@ namespace Roblox {
 std::string Roblox::nameable_t::GetName() {
 	std::uint64_t name_ptr = memory->read<std::uint64_t>(this->address + Offsets::Instance::Name);
 	if (name_ptr) {
+		this->name = memory->read_string(name_ptr);
 		return memory->read_string(name_ptr);
 	}
-
+	this->name = "Unkown Name";
 	return "Unkown Name";
 }
 
@@ -109,10 +110,10 @@ Roblox::model_instance_t Roblox::player_t::GetModelInstance()
 	return memory->read<std::uint64_t>(this->address + Offsets::Player::ModelInstance);
 }
 
-
-Roblox::primitive_t Roblox::part_t::GetPrimitive()
-{
-	return memory->read<std::uint64_t>(this->address + Offsets::BasePart::Primitive);
+ 
+Roblox::primitive_t Roblox::part_t::GetPrimitive() const
+{ 
+	return memory->read<std::uintptr_t>(this->address + Offsets::BasePart::Primitive);
 }
 
 std::uint8_t Roblox::humanoid_t::GetRigType()
@@ -134,4 +135,9 @@ void Roblox::humanoid_t::SetWalkSpeed(float power)
 		memory->write(this->address + Offsets::Humanoid::Walkspeed, power);
 		memory->write(this->address + Offsets::Humanoid::WalkspeedCheck, power);
 	}
+}
+
+math::vector3 Roblox::primitive_t::GetPosition()
+{
+	return memory->read<math::vector3>(this->address + Offsets::BasePart::Position);
 }

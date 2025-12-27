@@ -14,7 +14,7 @@ void aimbot::Run()
     for (auto& entity : cache::cachedPlayers) {
         if (!entity.isLocal(entity) && GetAsyncKeyState(aimKey)) {
             math::vector2 target2D;
-            if (math::math::WorldToScreen(entity.headPosition, target2D, Visuals::Visuals::Visuals::GetViewMatrix())) {
+            if (math::math::WorldToScreen(entity.parts.find("Head")->second.GetPrimitive().GetPosition(), target2D, Visuals::Visuals::Visuals::GetViewMatrix())) {
                 float distanceToBody = math::vector2::Distance(math::vector2(curentPosition.x, curentPosition.y), target2D);
                 if (!useFOV || distanceToBody < fovRadius) {
 

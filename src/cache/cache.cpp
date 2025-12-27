@@ -1,4 +1,4 @@
-#include "cache.h"
+﻿#include "cache.h"
 #include <thread>
 #include "game/game.h"
 
@@ -16,72 +16,45 @@ void cache::Run() {
 				if (!modelInstance.address)
 					continue;
 
-				auto parts = modelInstance.GetChildren<Roblox::part_t>();
-				for (auto& part : parts) {
-					std::string partClass = part.GetClassNameA();
-					if (partClass.find("part") != std::string::npos && part.address) {
-						entity.parts[part.GetName()] = part;
+				auto children = modelInstance.GetChildren<Roblox::instance_t>();
+				for (auto& inst : children) {
+					try {
+						if (!inst.address) continue;
+						std::string className = inst.GetClassNameA();
+						if (className.empty()) continue;
+						if (className.ends_with("Part")) {
+							Roblox::part_t part;
+							part.address = inst.address;
+							//part. = inst.GetName();
+							entity.parts[inst.GetName()] = part;
+						}
+					}
+					catch (...) {
+						printf("%s", "Error In The Part Loop, Open A Issue!");
 					}
 				}
 
 				auto humanoidInst = modelInstance.FindFirstChild("Humanoid");
 				if (!humanoidInst.address) continue;
+
 				entity.humanoid = humanoidInst.address;
+				if (!entity.humanoid.address) continue;
 
 				entity.rigType = entity.humanoid.GetRigType();
 
 				entity.humanoid.Health = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::Health);
 				entity.humanoid.MaxHealth = memory->read<float>(entity.humanoid.address + Offsets::Humanoid::MaxHealth);
 				
-				if (entity.humanoid.Health <= 0.0f || entity.humanoid.MaxHealth <= 0.0f)
-					continue;
+				if (entity.humanoid.Health <= 0.0f || entity.humanoid.MaxHealth <= 0.0f) continue;
 
+			
 				auto rootPart = modelInstance.FindFirstChild("HumanoidRootPart");
-				if (!rootPart.address)
-					continue;
-
-				auto headPart = modelInstance.FindFirstChild("Head");
-				if (headPart.address)
-					entity.head = headPart.address;
-
-				Roblox::instance_t leftFootPart;
-				if (entity.rigType == 1) { // r15
-					leftFootPart = modelInstance.FindFirstChild("LeftFoot");
-					if (leftFootPart.address)
-						entity.leftLeg = leftFootPart.address;
-				}
-				else { // r6
-					leftFootPart = modelInstance.FindFirstChild("LeftLeg");
-					if (leftFootPart.address)
-					entity.leftLeg = leftFootPart.address;
-				}
-
-				auto leftArmPart = modelInstance.FindFirstChild("LeftArm");
-				if (leftArmPart.address) 
-					entity.leftArm = leftArmPart.address;
-
-				auto rightArmPart = modelInstance.FindFirstChild("RightArm");
-				if (rightArmPart.address)
-					entity.rightArm = rightArmPart.address;
-
+				if (!rootPart.address) continue;
 				auto primitive = memory->read<uintptr_t>(rootPart.address + Offsets::BasePart::Primitive);
 				if (!primitive) continue;
 
-				auto headPrimitive = headPart.address ? memory->read<uintptr_t>(headPart.address + Offsets::BasePart::Primitive) : 0;
-				auto leftFootPrimitive = leftFootPart.address ? memory->read<uintptr_t>(leftFootPart.address + Offsets::BasePart::Primitive) : 0;
-				auto leftArmPrimitive = leftArmPart.address ? memory->read<uintptr_t>(leftArmPart.address + Offsets::BasePart::Primitive) : 0;
-				auto rightArmPrimitive = rightArmPart.address ? memory->read<uintptr_t>(rightArmPart.address + Offsets::BasePart::Primitive) : 0;
-
 				entity.position = memory->read<math::vector3>(primitive + Offsets::BasePart::Position);
-				if (headPrimitive) 
-					entity.headPosition = memory->read<math::vector3>(headPrimitive + Offsets::BasePart::Position);
-				if (leftFootPrimitive) 
-					entity.footPosition = memory->read<math::vector3>(leftFootPrimitive + Offsets::BasePart::Position);
-				if (rightArmPrimitive) 
-					entity.rightArmPosition = memory->read<math::vector3>(rightArmPrimitive + Offsets::BasePart::Position);
-				if (leftArmPrimitive) 
-					entity.leftArmPosition = memory->read<math::vector3>(leftArmPrimitive + Offsets::BasePart::Position);
-
+		
 				entity.health = entity.humanoid.Health;
 				entity.maxHealth = entity.humanoid.MaxHealth;
 

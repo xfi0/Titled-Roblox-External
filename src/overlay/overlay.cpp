@@ -248,7 +248,7 @@ void Overlay::DrawWatermark()
             ImGui::Checkbox("Box ESP", &Visuals::BoxESP::boxESPEnabled);
             ImGui::Checkbox("Filled Box ESP", &Visuals::BoxESP::filled);
             ImGui::ColorEdit4("Box Color", (float*)&Visuals::BoxESP::boxColor, ImGuiColorEditFlags_NoInputs);
-            ImGui::SliderFloat("Box Rounding", &Visuals::BoxESP::rounding, 0.0f, 1.0f, "%.2f");
+            ImGui::SliderFloat("Box Rounding", &Visuals::BoxESP::rounding, 0.0f, 10.f, "%.2f");
             ImGui::Checkbox("Name ESP", &Visuals::NameESP::nameESPEnabled);
             ImGui::Checkbox("Health Bar", &Visuals::HealthBar::healthBarEnabled);
             ImGui::NextColumn();

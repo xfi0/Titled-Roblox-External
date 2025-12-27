@@ -12,19 +12,16 @@ namespace cache {
 		std::string name;
 		std::uint8_t rigType;
 		Roblox::humanoid_t humanoid;
-		Roblox::humanoid_t head;
-		Roblox::humanoid_t leftArm;
-		Roblox::humanoid_t rightArm;
-		Roblox::humanoid_t leftLeg;
-		Roblox::humanoid_t rightLeg;
+		Roblox::instance_t head;
+		Roblox::instance_t leftArm;
+		Roblox::instance_t rightArm;
+		Roblox::instance_t leftLeg;
+		Roblox::instance_t rightLeg;
 		math::vector3 position;
-		math::vector3 headPosition;
-		math::vector3 footPosition;
-		math::vector3 leftArmPosition;
-		math::vector3 rightArmPosition;
 		float health;
 		float maxHealth;
-		bool isLocal(const entity_t& entity); // wanted to just do a {return humanoid address...} but stupid cpp
+		std::uint64_t playerAddress;
+		bool isLocal(const entity_t& entity);
 		std::unordered_map<std::string, Roblox::part_t> parts;
 	};
 	inline cache::entity_t cachedLocalPlayer;
