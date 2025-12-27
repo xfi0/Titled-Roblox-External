@@ -18,6 +18,7 @@ namespace cache {
 		Roblox::instance_t leftLeg;
 		Roblox::instance_t rightLeg;
 		math::vector3 position;
+		math::vector3 rotation;
 		float health;
 		float maxHealth;
 		std::uint64_t playerAddress;

@@ -36,7 +36,7 @@ public:
     void EndFrame();
 
     void DrawText(math::vector2 position, const char* text, unsigned int color = 0xFFFFFFFF);
-    void DrawWatermark();
+    void DrawWindow();
     void DrawESPOverlay();
     float GetFPS() const { return current_fps; }
     bool ShouldExit();
@@ -44,6 +44,7 @@ public:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 private:
     void CreateOverlayWindow();
+    void CreateESPWindow();
     void InitializeDirectX();
     void InitializeImGui();
 };
