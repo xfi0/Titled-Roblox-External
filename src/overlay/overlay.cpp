@@ -267,6 +267,14 @@ void Overlay::DrawWatermark()
             ImGui::Checkbox("AimBot", &aimbot::aimbotEnabled);
             ImGui::Checkbox("Draw FOV", &aimbot::drawFOV);
             ImGui::Checkbox("Use FOV", &aimbot::useFOV);
+
+            ImGui::SliderFloat(
+                "FOV Radius",
+                &aimbot::fovRadius,
+                20.0f,
+                500.0f,
+                "%.0f"
+            );
         }
         else if (tab == 3) {
             if (ImGui::Button("Save Position")){
