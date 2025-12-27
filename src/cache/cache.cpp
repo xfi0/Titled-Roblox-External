@@ -20,11 +20,16 @@ void cache::Run() {
 				for (auto& inst : children) {
 					try {
 						if (!inst.address) continue;
+
 						std::string className = inst.GetClassNameA();
+
 						if (className.empty()) continue;
+
 						if (className.ends_with("Part")) {
 							Roblox::part_t part;
 							part.address = inst.address;
+
+							if (!part.address) continue;
 							//part. = inst.GetName();
 							entity.parts[inst.GetName()] = part;
 						}
