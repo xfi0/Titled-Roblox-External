@@ -14,13 +14,10 @@ void movement::Teleport(math::vector3 Position)
 void movement::SavePosition() {
 	printf("\n Saved Position %f %f %f\n", cache::cachedLocalPlayer.position.x, cache::cachedLocalPlayer.position.y, cache::cachedLocalPlayer.position.z);
 }
-void movement::SpinBot() {
-
+void movement::SpinBot() { // SOMEONE GET FUCKING CFRAME OR ROTATE PLEASE I NEED IT PLEASE PUT IT HERE I STFG IM GONNA CRY - sleepy
+	
 }
-struct cframe final
-{
 
-};
 void movement::NoClip() // probably ahh but i tested 3 other things and it wouldnt work, neither does this
 {
 	try {

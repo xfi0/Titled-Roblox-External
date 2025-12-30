@@ -294,12 +294,12 @@ void Overlay::DrawWindow()
             if (ImGui::Checkbox("SpinBot", &SpinEnabled)) {
                 movement::SpinBot();
             }
-            static float JumpPower = 50.0f;
+            static float JumpPower = 16.0f;
             if (ImGui::SliderFloat("Jump Power", &JumpPower, 0.0f, 100.0f))
             {
                 cache::cachedLocalPlayer.humanoid.SetJumpPower(JumpPower);
             }
-            static float WalkSpeed = 50.0f;
+            static float WalkSpeed = 16.0f;
             if (ImGui::SliderFloat("Walk Speed", &WalkSpeed, 0.0f, 100.0f))
             {
                 cache::cachedLocalPlayer.humanoid.SetWalkSpeed(WalkSpeed);
